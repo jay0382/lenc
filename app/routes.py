@@ -6,7 +6,10 @@ main = Blueprint('main', __name__)
 @main.route('/<alias>')
 def redirecionar(alias):
     url = buscar_url(alias)
-    return redirect(url) if url else "Alias não encontrado", 404
+    if url:
+        return redirect(url)
+    else:
+        return "Alias não encontrado", 404
 
 @main.route('/')
 def home():

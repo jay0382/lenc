@@ -1,12 +1,19 @@
-import sqlite3
+import psycopg2
 import os
+from dotenv import load_dotenv
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'urls.db')
+# Carrega as variáveis do arquivo .env
+load_dotenv()
+
+DB_URL = os.getenv("DATABASE_URL")
+
+def conectar():
+    return psycopg2.connect(DB_URL)
 
 def alias_existe(alias):
-    conn = sqlite3.connect(DB_PATH)
+    conn = conectar()
     cursor = conn.cursor()
-    cursor.execute("SELECT 1 FROM links WHERE alias=?", (alias,))
+    cursor.execute("SELECT 1 FROM links WHERE alias=%s", (alias,))
     existe = cursor.fetchone() is not None
     conn.close()
     return existe
@@ -26,14 +33,14 @@ def sugestoes_alias(alias_base):
     return sugestões[:3]
 
 def inserir_link(alias, url):
-    conn = sqlite3.connect(DB_PATH)
+    conn = conectar()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO links (alias, url_real) VALUES (?, ?)", (alias, url))
+    cursor.execute("INSERT INTO links (alias, url_real) VALUES (%s, %s)", (alias, url))
     conn.commit()
     conn.close()
 
 # Interface CLI
-print("\n=== LAVINES ENCURTADOR [Modo Termux] ===")
+print("\n=== LAVINES ENCURTADOR [Modo Termux com NeonDB] ===")
 url = input("Digite a URL real: ").strip()
 alias = input("Digite o alias desejado (ex: meulink): ").strip()
 
@@ -49,4 +56,4 @@ if alias_existe(alias):
 else:
     inserir_link(alias, url)
     print(f"\n[✓] Link encurtado com sucesso!")
-    print(f"→ http://localhost:5000/{alias}")
+    print(f"→ https://enc-m8i4.onrender.com/{alias}")
