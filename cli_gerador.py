@@ -2,9 +2,27 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 
-# Carrega as variáveis do arquivo .env
-load_dotenv()
+# Cores ANSI para terminal
+VERDE = "\033[1;32m"
+VERMELHO = "\033[1;31m"
+AZUL = "\033[1;34m"
+AMARELO = "\033[1;33m"
+RESET = "\033[0m"
+NEGRITO = "\033[1m"
 
+# Banner
+banner = f"""
+{AZUL}{NEGRITO}
+╔════════════════════════════════════════════════════╗
+║            LAVINES ENCURTADOR [NeonDB]            ║
+╠════════════════════════════════════════════════════╣
+║        Crie links curtos e personalizados!         ║
+╚════════════════════════════════════════════════════╝
+{RESET}
+"""
+
+# Carrega .env
+load_dotenv()
 DB_URL = os.getenv("DATABASE_URL")
 
 def conectar():
@@ -40,20 +58,20 @@ def inserir_link(alias, url):
     conn.close()
 
 # Interface CLI
-print("\n=== LAVINES ENCURTADOR [Modo Termux com NeonDB] ===")
-url = input("Digite a URL real: ").strip()
-alias = input("Digite o alias desejado (ex: meulink): ").strip()
+print(banner)
+url = input(f"{AZUL}Digite a URL real: {RESET}").strip()
+alias = input(f"{AZUL}Digite o alias desejado (ex: meulink): {RESET}").strip()
 
 if alias_existe(alias):
-    print(f"\n[!] O alias '{alias}' já está em uso.")
+    print(f"\n{VERMELHO}[!] O alias '{alias}' já está em uso.{RESET}")
     sugestões = sugestoes_alias(alias)
     if sugestões:
-        print("Sugestões disponíveis:")
+        print(f"{AMARELO}Sugestões disponíveis:{RESET}")
         for s in sugestões:
-            print(f" - {s}")
+            print(f" - {VERDE}{s}{RESET}")
     else:
-        print("Nenhuma sugestão disponível no momento.")
+        print(f"{VERMELHO}Nenhuma sugestão disponível no momento.{RESET}")
 else:
     inserir_link(alias, url)
-    print(f"\n[✓] Link encurtado com sucesso!")
-    print(f"→ https://enc-m8i4.onrender.com/{alias}")
+    print(f"\n{VERDE}[✓] Link encurtado com sucesso!{RESET}")
+    print(f"{AZUL}→ https://enc-m8i4.onrender.com/{alias}{RESET}")
